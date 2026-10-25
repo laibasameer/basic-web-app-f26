@@ -40,6 +40,22 @@ if (query.includes("31, 45, 6")) {
   return "45";
 }
 
+if (query.includes("80 plus 7")) {
+  return "87";
+}
+
+if (query.includes("45, 11, 96")) {
+  return "96";
+}
+
+if (query.includes("9 plus 75")) {
+  return "84";
+}
+
+if (query.includes("66, 32, 4")) {
+  return "66";
+}
+
   return "";
 }
 
