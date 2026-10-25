@@ -1,4 +1,126 @@
 
+function add(a: string, b: string): string {
+  let i = a.length - 1;
+  let j = b.length - 1;
+  let carry = 0;
+  let result = "";
+
+  while (i >= 0 || j >= 0 || carry > 0) {
+    const sum =
+      (i >= 0 ? Number(a[i--]) : 0) +
+      (j >= 0 ? Number(b[j--]) : 0) + carry;
+
+    result = String(sum % 10) + result;
+    carry = Math.floor(sum / 10);
+  }
+
+  return result;
+}
+
+function multiply(a: string, b: string): string {
+  const result = Array(a.length + b.length).fill(0);
+
+  for (let i = a.length - 1; i >= 0; i--) {
+    for (let j = b.length - 1; j >= 0; j--) {
+      const product = Number(a[i]) * Number(b[j]) + result[i + j + 1];
+      result[i + j + 1] = product % 10;
+      result[i + j] += Math.floor(product / 10);
+    }
+  }
+
+  return result.join("").replace(/^0+(?=\d)/, "");
+}
+
+function power(base: string, exponent: number): string {
+  let result = "1";
+
+  for (let i = 0; i < exponent; i++) {
+    result = multiply(result, base);
+  }
+
+  return result;
+}
+
+function evaluate(query: string): string {
+  let expression = query.toLowerCase()
+    .replace(/^.*?what is\s*/, "")
+    .replace(/\?+$/, "")
+    .replace(/multiplied by/g, "*")
+    .replace(/times/g, "*")
+    .replace(/plus/g, "+")
+    .replace(/minus/g, "-")
+    .replace(/to the power of/g, "^")
+    .replace(/\s+/g, "");
+
+  const tokens = expression.match(/\d+|[+*^()-]/g);
+  if (!tokens || tokens.join("") !== expression) return "";
+
+  let pos = 0;
+
+  function atom(): string {
+    if (tokens![pos] === "(") {
+      pos++;
+      const value = sum();
+      if (tokens![pos] !== ")") throw new Error("Missing )");
+      pos++;
+      return value;
+    }
+
+    const token = tokens![pos++];
+    if (!token || !/^\d+$/.test(token)) throw new Error("Expected number");
+    return token.replace(/^0+(?=\d)/, "");
+  }
+
+  function exponentiation(): string {
+    const base = atom();
+
+    if (tokens![pos] === "^") {
+      pos++;
+      const exp = exponentiation();
+      const n = Number(exp);
+
+      if (!Number.isSafeInteger(n) || n > 1000) {
+        throw new Error("Exponent out of range");
+      }
+
+      return power(base, n);
+    }
+
+    return base;
+  }
+
+  function product(): string {
+    let value = exponentiation();
+
+    while (tokens![pos] === "*") {
+      pos++;
+      value = multiply(value, exponentiation());
+    }
+
+    return value;
+  }
+
+  function sum(): string {
+    let value = product();
+
+    while (tokens![pos] === "+" || tokens![pos] === "-") {
+      const operator = tokens![pos++];
+
+      if (operator === "-") {
+        throw new Error("Subtraction not supported yet");
+      }
+
+      value = add(value, product());
+    }
+
+    return value;
+  }
+
+  const answer = sum();
+  if (pos !== tokens.length) return "";
+  return answer;
+}
+
 export default function QueryProcessor(query: string): string {
   const q = query.toLowerCase();
 
@@ -14,37 +136,19 @@ export default function QueryProcessor(query: string): string {
   if (q.includes("name")) return "lsameer";
   if (q.includes("age")) return "67";
 
-  // Addition: "What is 46 plus 60?"
-  const addition = q.match(
-    /what is (-?\d+)\s*(?:plus|\+)\s*(-?\d+)/i
-  );
-
-  if (addition) {
-    return String(Number(addition[1]) + Number(addition[2]));
+  if (q.includes("largest")) {
+    const numbers = q.match(/-?\d+/g);
+    if (numbers && numbers.length >= 3) {
+      return String(Math.max(...numbers.map(Number)));
+    }
   }
 
-  // Powers: "What is 85 to the power of 82?"
-  const power = q.match(
-    /what is (\d+) to the power of (\d+)/i
-  );
-
-  if (power) {
-    const base = BigInt(power[1]);
-    const exponent = BigInt(power[2]);
-
-    if (exponent > 10000n) return "";
-    return String(base ** exponent);
-  }
-
-  // Largest number: "largest: 84, 89, 65"
-  const largest = q.match(
-    /largest:\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)/i
-  );
-
-  if (largest) {
-    return String(
-      Math.max(Number(largest[1]), Number(largest[2]), Number(largest[3]))
-    );
+  if (q.includes("what is")) {
+    try {
+      return evaluate(query);
+    } catch {
+      return "";
+    }
   }
 
   return "";
