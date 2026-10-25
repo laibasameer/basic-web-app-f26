@@ -202,12 +202,14 @@ if (q.includes("scrabble score of")) {
       y: 4, z: 10
     };
 
-    return String(
-      [...word].reduce(
-        (total, letter) => total + (scores[letter] ?? 0),
-        0
-      )
-    );
+    let total = 0;
+
+for (let i = 0; i < word.length; i++) {
+  const letter = word[i];
+  total += scores[letter] || 0;
+}
+
+return String(total);
   }
 }
 
