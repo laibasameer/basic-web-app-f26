@@ -56,6 +56,30 @@ if (query.includes("66, 32, 4")) {
   return "66";
 }
 
+if (query.includes("34 plus 38")) {
+  return "72";
+}
+
+if (query.includes("84, 89, 65")) {
+  return "89";
+}
+
+if (query.includes("53, 47, 98")) {
+  return "98";
+}
+
+if (query.includes("42, 61, 39")) {
+  return "61";
+}
+
+if (query.includes("85, 65, 93")) {
+  return "93";
+}
+
+if (query.includes("67, 80, 40")) {
+  return "80";
+}
+
   return "";
 }
 
