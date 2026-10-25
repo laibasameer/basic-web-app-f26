@@ -1,3 +1,4 @@
+
 export default function QueryProcessor(query: string): string {
   if (query.toLowerCase().includes("shakespeare")) {
     return (
@@ -5,6 +6,10 @@ export default function QueryProcessor(query: string): string {
       "English poet, playwright, and actor, widely regarded as the greatest " +
       "writer in the English language and the world's pre-eminent dramatist."
     );
+  }
+
+  if (query.toLowerCase().includes("andrew id")) {
+    return "laibasameer";
   }
 
   if (query.toLowerCase().includes("name")) {
@@ -15,7 +20,6 @@ export default function QueryProcessor(query: string): string {
     return "67";
   }
 
-
-
   return "";
 }
+
