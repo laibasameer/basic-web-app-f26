@@ -80,6 +80,17 @@ if (query.includes("67, 80, 40")) {
   return "80";
 }
 
+// Handle power questions
+const powerMatch = query.match(
+  /what is (\d+) to the power of (\d+)/i
+);
+
+if (powerMatch) {
+  const base = Number(powerMatch[1]);
+  const exponent = Number(powerMatch[2]);
+
+  return String(Math.pow(base, exponent));
+}
   return "";
 }
 
