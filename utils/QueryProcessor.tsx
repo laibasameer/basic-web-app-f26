@@ -151,5 +151,20 @@ export default function QueryProcessor(query: string): string {
     }
   }
 
+  if (q.includes("anagram of")) {
+  const match = q.match(/anagram of ([a-z]+):?\s*(.*)/i);
+
+  if (match) {
+    const target = match[1].split("").sort().join("");
+    const options = match[2].match(/[a-z]+/g) ?? [];
+
+    const answer = options.find(
+      (word) => word.split("").sort().join("") === target
+    );
+
+    if (answer) return answer;
+  }
+}
+
   return "";
 }
